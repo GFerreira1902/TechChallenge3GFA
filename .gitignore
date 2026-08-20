@@ -1,0 +1,71 @@
+﻿# ========================================
+# Python
+# ========================================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ========================================
+# Virtual environment
+# ========================================
+.venv/
+env/
+venv/
+
+# ========================================
+# Jupyter
+# ========================================
+.ipynb_checkpoints/
+
+# ========================================
+# IDE / Editor
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ========================================
+# OS
+# ========================================
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ========================================
+# Dados (regeneraveis pelos notebooks)
+# ========================================
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# ========================================
+# Modelos binarios (regeneraveis)
+# ========================================
+outputs/models/*
+!outputs/models/.gitkeep
+
+# ========================================
+# Kaggle
+# ========================================
+kaggle.json
+
+# ========================================
+# Arquivos internos (nao entregaveis)
+# ========================================
+docs/*.pdf
+_rebuild_eda.py
+_gerar_pdf.py
+
+# Secrets
+.env
+
+#Anexos da Entrega
+LinksEntrega.txt
