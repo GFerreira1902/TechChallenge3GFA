@@ -2,6 +2,8 @@
 
 **Integrante / Matrícula:** Guilherme Ferreira de Arruda / rm373210
 
+**Repositório GitHub:** [TechChallenge3GFA](https://github.com/GFerreira1902/TechChallenge3GFA)
+
 ## Visão Geral do Projeto
 
 Projeto da Fase 3 do Tech Challenge (Pós-Graduação IA para Devs - FIAP), independente da Fase 2
@@ -14,10 +16,12 @@ próprios (sintéticos/anonimizados) do hospital, capaz de:
   sugestão de tratamento, emissão de alertas) via **LangGraph**;
 - Garantir explicabilidade (fonte da informação) e auditoria (logging) de cada resposta.
 
-> Repositório desvinculado da Fase 2: sem histórico de git compartilhado, remote próprio e
-> nenhum arquivo específico do domínio anterior (classificação de câncer de mama / GA).
-> O arquivo `docs/reference/fase2_llm_explainer.py` foi mantido apenas como referência para
-> uma eventual decisão de reaproveitamento do padrão de explicabilidade/logging.
+> Repositório desvinculado da Fase 2: sem histórico de git compartilhado e remote próprio
+> (`TechChallenge2GFA`), sem nenhum arquivo específico do domínio anterior (classificação de
+> câncer de mama / GA). O padrão de explicabilidade/auditoria da Fase 2
+> (`docs/reference/fase2_llm_explainer.py`) foi reaproveitado e generalizado em
+> `src/langchain_pipeline/llm_client.py` (cliente Groq com fallback seguro/mock mode) e
+> `src/guardrails/audit_logger.py` (log de auditoria em JSON de cada interação).
 
 ## Arquitetura e Tecnologias (planejado)
 
@@ -74,6 +78,7 @@ python -m pytest tests/ -v
 
 ## Entregáveis da Fase 3
 
+- **Repositório GitHub Oficial:** [Acessar Código Fonte](https://github.com/GFerreira1902/TechChallenge3GFA)
 - Código-fonte: pipeline de fine-tuning, integração LangChain, fluxos LangGraph;
 - Dataset anonimizado/sintético;
 - Relatório técnico: processo de fine-tuning, descrição do assistente, diagrama do fluxo
