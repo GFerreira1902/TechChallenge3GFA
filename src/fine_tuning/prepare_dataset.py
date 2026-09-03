@@ -90,6 +90,25 @@ def write_jsonl(path: str, examples: list[dict]) -> None:
             f.write(json.dumps(ex, ensure_ascii=False) + "\n")
 
 
+def stratified_sample(examples: list[dict], max_samples: int) -> list[dict]:
+    """Amostra proporcionalmente por `question_type`, preservando a distribuicao
+    de categorias do dataset completo mesmo em um subconjunto pequeno."""
+    by_category: dict[str, list[dict]] = {}
+    for ex in examples:
+        category = ex["source"]["question_type"] or "desconhecido"
+        by_category.setdefault(category, []).append(ex)
+
+    total = len(examples)
+    sample: list[dict] = []
+    for category, items in by_category.items():
+        random.shuffle(items)
+        quota = max(1, round(len(items) / total * max_samples))
+        sample.extend(items[:quota])
+
+    random.shuffle(sample)
+    return sample[:max_samples]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--max-samples", type=int, default=4000, help="Tamanho do subconjunto de treino+validação amostrado")
@@ -112,7 +131,7 @@ def main() -> None:
     print(f"Dataset completo limpo salvo em {clean_path}")
 
     random.shuffle(examples)
-    sample = examples[: args.max_samples]
+    sample = stratified_sample(examples, args.max_samples)
     val_size = max(1, int(len(sample) * args.val_ratio))
     val_sample = sample[:val_size]
     train_sample = sample[val_size:]

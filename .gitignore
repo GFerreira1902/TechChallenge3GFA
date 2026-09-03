@@ -39,10 +39,12 @@ Desktop.ini
 .DS_Store
 
 # ========================================
-# Dados (regeneraveis pelos notebooks)
+# Dados (regeneraveis pelos notebooks/scripts)
 # ========================================
 data/raw/*
 !data/raw/.gitkeep
+!data/raw/synthetic_protocols.json
+!data/raw/synthetic_patients.json
 data/processed/*
 !data/processed/.gitkeep
 
@@ -51,6 +53,12 @@ data/processed/*
 # ========================================
 outputs/models/*
 !outputs/models/.gitkeep
+
+# ========================================
+# Logs de auditoria (gerados em runtime)
+# ========================================
+outputs/audit_log.json
+outputs/llm_history.json
 
 # ========================================
 # Kaggle

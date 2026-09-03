@@ -1,0 +1,65 @@
+{
+  "_aviso": "Protocolos fictícios gerados para fins acadêmicos (Tech Challenge Fase 3). Não representam condutas médicas reais nem devem ser usados em ambiente clínico.",
+  "protocolos": [
+    {
+      "protocol_id": "PROT-001",
+      "titulo": "Protocolo de Dor Torácica Aguda",
+      "categoria": "cardiologia",
+      "conteudo": "Todo paciente com queixa de dor torácica aguda deve realizar ECG de 12 derivações em ate 10 minutos da chegada. Solicitar troponina seriada (0h/1h/3h). Classificar risco pelo escore HEART. Pacientes de alto risco (HEART >= 7) devem ser encaminhados para a unidade coronariana e avaliados pela cardiologia antes de qualquer alta. Analgesia com nitrato sublingual esta contraindicada em suspeita de infarto de ventriculo direito ou uso recente de inibidores da fosfodiesterase-5."
+    },
+    {
+      "protocol_id": "PROT-002",
+      "titulo": "Protocolo de Sepse e Choque Septico",
+      "categoria": "emergencia",
+      "conteudo": "Pacientes com suspeita de sepse devem iniciar o pacote da primeira hora: coleta de lactato serico, hemoculturas antes da antibioticoterapia, inicio de antibiotico de amplo espectro em ate 1 hora, reposicao volemica com cristaloide 30 mL/kg em caso de hipotensao ou lactato >= 4 mmol/L, e reavaliacao de lactato em 2 a 4 horas. Vasopressor (noradrenalina) indicado se pressao arterial media permanecer < 65 mmHg apos reposicao volemica adequada."
+    },
+    {
+      "protocol_id": "PROT-003",
+      "titulo": "Protocolo de Manejo da Hipertensao Arterial em Internacao",
+      "categoria": "clinica_medica",
+      "conteudo": "Em pacientes internados com hipertensao arterial sistemica cronica, evitar reducao abrupta da pressao arterial exceto em emergencia hipertensiva (lesao aguda de orgao-alvo). Meta de reducao em emergencias hipertensivas: no maximo 25% da pressao arterial media na primeira hora. Reavaliar funcao renal e eletrólitos antes de ajustar diureticos. Suspender temporariamente inibidores da ECA/BRA em caso de lesao renal aguda."
+    },
+    {
+      "protocol_id": "PROT-004",
+      "titulo": "Protocolo de Controle Glicemico em Pacientes Diabeticos Internados",
+      "categoria": "endocrinologia",
+      "conteudo": "Meta glicemica para a maioria dos pacientes internados nao criticos: 140-180 mg/dL. Evitar hipoglicemia (< 70 mg/dL); em caso de hipoglicemia, administrar 15g de carboidrato de absorcao rapida e reavaliar em 15 minutos. Pacientes em uso de insulina basal-bolus devem ter glicemia capilar aferida antes das refeicoes e ao deitar. Suspender metformina em pacientes com risco de lesao renal aguda ou antes de exames com contraste iodado."
+    },
+    {
+      "protocol_id": "PROT-005",
+      "titulo": "Protocolo de Investigacao de Apendicite Aguda",
+      "categoria": "cirurgia_geral",
+      "conteudo": "Pacientes com dor em fossa iliaca direita, sinais de irritacao peritoneal e leucocitose devem ser avaliados com escore de Alvarado. Escore >= 7 indica alta probabilidade de apendicite e justifica avaliacao cirurgica direta. Escore intermediario (5-6) requer tomografia computadorizada ou ultrassonografia abdominal antes da decisao cirurgica. Antibioticoprofilaxia deve ser administrada ate 60 minutos antes da incisao cirurgica."
+    },
+    {
+      "protocol_id": "PROT-006",
+      "titulo": "Protocolo de Alta Hospitalar Segura",
+      "categoria": "gestao_clinica",
+      "conteudo": "Antes da alta, confirmar que todos os exames pendentes foram resultados e revisados pelo medico assistente. Realizar reconciliacao medicamentosa completa. Fornecer ao paciente resumo de alta com diagnosticos, medicacoes atuais e sinais de alarme para retorno. Agendar retorno ambulatorial em ate 7 dias para condicoes de alto risco de reinternacao (insuficiencia cardiaca, DPOC exacerbado, AVC)."
+    },
+    {
+      "protocol_id": "PROT-007",
+      "titulo": "Protocolo de Profilaxia de Tromboembolismo Venoso",
+      "categoria": "clinica_medica",
+      "conteudo": "Todo paciente internado deve ser avaliado quanto ao risco de tromboembolismo venoso (escore de Padua ou Caprini). Pacientes de risco elevado sem contraindicacao devem receber profilaxia farmacologica com heparina de baixo peso molecular. Contraindicacoes incluem sangramento ativo, plaquetopenia grave (< 50.000/mm3) e cirurgia neurologica recente. Nesses casos, priorizar profilaxia mecanica (compressao pneumatica intermitente)."
+    },
+    {
+      "protocol_id": "PROT-008",
+      "titulo": "Protocolo de Manejo Inicial do Acidente Vascular Cerebral Isquemico",
+      "categoria": "neurologia",
+      "conteudo": "Pacientes com suspeita de AVC devem realizar tomografia de cranio sem contraste em ate 25 minutos da chegada. Determinar horario exato do ultimo momento assintomatico. Trombolise endovenosa e indicada em ate 4,5 horas do inicio dos sintomas, na ausencia de contraindicacoes (sangramento ativo, cirurgia de grande porte recente, AVC hemorragico previo). Pressao arterial deve ser controlada para menor que 185x110 mmHg antes da trombolise."
+    },
+    {
+      "protocol_id": "PROT-009",
+      "titulo": "Protocolo de Prescricao Segura de Antibioticos",
+      "categoria": "farmacia_clinica",
+      "conteudo": "Toda prescricao de antibiotico de amplo espectro deve ser reavaliada em 48-72 horas (checklist de desescalonamento), conforme resultado de culturas e evolucao clinica. Ajustar dose conforme funcao renal (clearance de creatinina). Nenhuma prescricao de antibioticoterapia deve ser finalizada sem validacao do medico responsavel; o assistente virtual pode sugerir opcoes com base em protocolo, mas a decisao final e sempre humana."
+    },
+    {
+      "protocol_id": "PROT-010",
+      "titulo": "Protocolo de Comunicacao de Alertas Criticos da Equipe Medica",
+      "categoria": "seguranca_do_paciente",
+      "conteudo": "Resultados de exames criticos (potassio serico critico, hemoglobina < 7 g/dL, saturacao de oxigenio < 90% persistente, troponina positiva) devem gerar alerta imediato para o medico assistente e o enfermeiro responsavel, com registro do horario de emissao e confirmacao de recebimento. Nenhum alerta critico deve ficar sem resposta documentada por mais de 30 minutos."
+    }
+  ]
+}

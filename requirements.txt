@@ -13,8 +13,10 @@ torch>=2.3.0
 # Orquestração (RAG + fluxos de decisão)
 langchain>=0.2.0
 langchain-community>=0.2.0
+langchain-huggingface>=0.0.3
 langgraph>=0.2.0
 faiss-cpu>=1.8.0
+sentence-transformers>=3.0.0
 
 # LLM (explicabilidade/auditoria - reaproveitado da Fase 2)
 groq>=0.8.0
