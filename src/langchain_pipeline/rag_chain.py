@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from src.langchain_pipeline.knowledge_base import load_index
-from src.langchain_pipeline.llm_client import MedicalAssistantLLMClient
+from src.langchain_pipeline.local_llm_client import LocalFineTunedLLMClient
 from src.langchain_pipeline.patient_records import format_patient_context, get_patient
 
 SYSTEM_PROMPT = (
@@ -25,11 +25,11 @@ SYSTEM_PROMPT = (
 class MedicalAssistantRAG:
     def __init__(
         self,
-        llm_client: Optional[MedicalAssistantLLMClient] = None,
+        llm_client: Optional[Any] = None,
         top_k: int = 3,
     ):
         self.vectorstore = load_index()
-        self.llm_client = llm_client or MedicalAssistantLLMClient()
+        self.llm_client = llm_client or LocalFineTunedLLMClient()
         self.top_k = top_k
 
     def _retrieve(self, question: str) -> list[dict]:
