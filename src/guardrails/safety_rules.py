@@ -10,8 +10,8 @@ DIRECT_PRESCRIPTION_PATTERNS = [
     r"\btome\b",
     r"\badministre\b(?!.*valida)",
     r"\bprescrevo\b",
-    r"\baplique\b.*\bmg\b",
-    r"\binicie\b.*\b(mg|ml|dose)\b",
+    r"\baplique\b.*\d+\s*mg",
+    r"\binicie\b.*(\d+\s*(mg|ml)|\bdose\b)",
 ]
 
 HUMAN_VALIDATION_DISCLAIMER = (
