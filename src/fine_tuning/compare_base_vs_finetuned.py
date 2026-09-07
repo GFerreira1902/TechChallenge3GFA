@@ -1,8 +1,12 @@
 """Compara respostas do modelo base vs. modelo fine-tuned (adaptador LoRA) para
 as mesmas perguntas, como evidencia qualitativa para o relatorio tecnico.
+
+Uso:
+    python -m src.fine_tuning.compare_base_vs_finetuned --adapter-path outputs/models/qwen2.5-1.5b-lora-medquad-v2/final_adapter
 """
 from __future__ import annotations
 
+import argparse
 import os
 
 os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "max_split_size_mb:128")
@@ -13,7 +17,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from src.fine_tuning.train import BASE_MODEL
 
-ADAPTER_PATH = "outputs/models/qwen2.5-1.5b-lora-medquad/final_adapter"
+DEFAULT_ADAPTER_PATH = "outputs/models/qwen2.5-1.5b-lora-medquad/final_adapter"
 
 SYSTEM_PROMPT = (
     "Você é um assistente virtual médico, treinado com protocolos internos e "
@@ -26,6 +30,7 @@ SYSTEM_PROMPT = (
 QUESTIONS = [
     "What is (are) Appendicitis ?",
     "What are the treatments for high blood pressure ?",
+    "What are the symptoms of sepsis ?",
 ]
 
 
@@ -45,6 +50,10 @@ def generate(model, tokenizer, question: str) -> str:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--adapter-path", default=DEFAULT_ADAPTER_PATH)
+    args = parser.parse_args()
+
     tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -63,8 +72,8 @@ def main() -> None:
         base_answer = generate(base_model, tokenizer, question)
         print(f"--- BASE (sem fine-tuning) ---\n{base_answer}\n")
 
-    print("Carregando adaptador LoRA fine-tuned...")
-    ft_model = PeftModel.from_pretrained(base_model, ADAPTER_PATH)
+    print(f"Carregando adaptador LoRA fine-tuned de {args.adapter_path}...")
+    ft_model = PeftModel.from_pretrained(base_model, args.adapter_path)
 
     for question in QUESTIONS:
         print("=" * 80)
