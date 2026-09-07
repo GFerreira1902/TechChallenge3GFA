@@ -33,6 +33,14 @@ MIN_ANSWER_CHARS = 20
 MAX_ANSWER_CHARS = 1500
 MIN_QUESTION_CHARS = 8
 
+# Respostas do MedQuAD que apenas listam links/recursos externos em vez de
+# responder de fato (comum em fontes GARD/NIH) - baixo valor para fine-tuning.
+LOW_CONTENT_PREFIXES = (
+    "these resources",
+    "this resource",
+    "resources address",
+)
+
 
 def clean_examples(dataset) -> list[dict]:
     """Filtra e formata os pares pergunta/resposta em exemplos de instrução.
@@ -62,6 +70,8 @@ def clean_examples(dataset) -> list[dict]:
         if len(question) < MIN_QUESTION_CHARS:
             continue
         if not (MIN_ANSWER_CHARS <= len(answer) <= MAX_ANSWER_CHARS):
+            continue
+        if answer.strip().lower().startswith(LOW_CONTENT_PREFIXES):
             continue
 
         seen_ids.add(question_id)
