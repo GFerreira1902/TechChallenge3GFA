@@ -79,13 +79,13 @@ sequenceDiagram
 
 ## 4. Componentes e responsabilidades
 
-| Componente | Arquivo | Responsabilidade |
-|---|---|---|
-| Fine-tuning (QLoRA) | `src/fine_tuning/train.py` | Adapta o Qwen2.5-1.5B-Instruct aos dados do MedQuAD (protocolos/FAQs sintéticos) |
-| Base de conhecimento | `src/langchain_pipeline/knowledge_base.py` | Índice FAISS sobre os protocolos internos sintéticos (embeddings CPU) |
-| Prontuários | `src/langchain_pipeline/patient_records.py` | Consulta estruturada aos dados fictícios de pacientes |
-| Cliente LLM | `src/langchain_pipeline/llm_client.py` | Chamada ao LLM (Groq/fine-tuned) com fallback seguro |
-| RAG | `src/langchain_pipeline/rag_chain.py` | Orquestra retrieval + contexto do paciente + geração + citação de fontes |
-| Fluxo de decisão | `src/langgraph_flows/clinical_flow.py` | Orquestra exames pendentes → alertas → sugestão → resumo (LangGraph) |
-| Guardrails | `src/guardrails/safety_rules.py` | Bloqueia linguagem de prescrição direta e garante disclaimer de validação humana |
-| Auditoria | `src/guardrails/audit_logger.py` | Log JSON de toda interação (explicabilidade/rastreabilidade) |
+| Componente           | Arquivo                                     | Responsabilidade                                                                 |
+| -------------------- | ------------------------------------------- | -------------------------------------------------------------------------------- |
+| Fine-tuning (QLoRA)  | `src/fine_tuning/train.py`                  | Adapta o Qwen2.5-1.5B-Instruct aos dados do MedQuAD (protocolos/FAQs sintéticos) |
+| Base de conhecimento | `src/langchain_pipeline/knowledge_base.py`  | Índice FAISS sobre os protocolos internos sintéticos (embeddings CPU)            |
+| Prontuários          | `src/langchain_pipeline/patient_records.py` | Consulta estruturada aos dados fictícios de pacientes                            |
+| Cliente LLM          | `src/langchain_pipeline/llm_client.py`      | Chamada ao LLM (Groq/fine-tuned) com fallback seguro                             |
+| RAG                  | `src/langchain_pipeline/rag_chain.py`       | Orquestra retrieval + contexto do paciente + geração + citação de fontes         |
+| Fluxo de decisão     | `src/langgraph_flows/clinical_flow.py`      | Orquestra exames pendentes → alertas → sugestão → resumo (LangGraph)             |
+| Guardrails           | `src/guardrails/safety_rules.py`            | Bloqueia linguagem de prescrição direta e garante disclaimer de validação humana |
+| Auditoria            | `src/guardrails/audit_logger.py`            | Log JSON de toda interação (explicabilidade/rastreabilidade)                     |
