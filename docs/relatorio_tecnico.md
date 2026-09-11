@@ -97,8 +97,8 @@ paciente, o sistema:
    registra um alerta para a equipe médica, seguindo um protocolo interno
    específico para isso.
 4. **Busca os protocolos internos relevantes** para a pergunta feita (usando
-   busca por similaridade de texto, técnica conhecida como RAG — *Retrieval
-   Augmented Generation*, ou "geração aumentada por busca") e monta um
+   busca por similaridade de texto, técnica conhecida como RAG — _Retrieval
+   Augmented Generation_, ou "geração aumentada por busca") e monta um
    contexto combinando protocolo + dados do paciente.
 5. **Gera a resposta** usando o modelo fine-tuned, sempre citando de qual
    protocolo a informação veio (para explicabilidade).
@@ -144,7 +144,7 @@ flowchart TD
 ### O que melhorou com o fine-tuning
 
 Comparamos o modelo **antes** e **depois** do ajuste, usando a mesma pergunta:
-*"Quais os tratamentos para pressão alta?"*
+_"Quais os tratamentos para pressão alta?"_
 
 - **Modelo original (sem fine-tuning):** deu uma resposta genérica de bom
   senso geral, sem citar exatamente o estilo esperado de um material médico
