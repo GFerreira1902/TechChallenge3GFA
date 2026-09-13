@@ -114,6 +114,11 @@ python -m src.fine_tuning.train --num-train-epochs 1 --save-steps 30 `
 > Requer GPU. Ajustado para GPUs de 4GB (batch=1, 4-bit, cap de VRAM em 80%). Em
 > hardware mais limitado, feche outros apps que usam a GPU antes de rodar.
 
+O adaptador final está publicado no [Hugging Face](https://huggingface.co/gferreiradevv/techchallenge3-qwen25-medical-lora).
+Se `outputs/models/` não existir localmente, `local_llm_client.py` baixa esse
+adaptador automaticamente; não é necessário repetir o fine-tuning para testar
+o assistente.
+
 ### 3. Avaliar o modelo (base vs. fine-tuned)
 
 ```powershell
@@ -162,6 +167,8 @@ python -m pytest tests/ -v
 ## Entregáveis da Fase 3
 
 - **Repositório GitHub Oficial:** [Acessar Código Fonte](https://github.com/GFerreira1902/TechChallenge3GFA)
+- **Modelo fine-tuned:** [Qwen2.5 Medical LoRA no Hugging Face](https://huggingface.co/gferreiradevv/techchallenge3-qwen25-medical-lora)
+- **Dataset processado:** [MedQuAD Medical no Hugging Face](https://huggingface.co/datasets/gferreiradevv/techchallenge3-medquad-medical)
 - Código-fonte: pipeline de fine-tuning, integração LangChain, fluxos LangGraph;
 - Dataset anonimizado/sintético;
 - Relatório técnico: processo de fine-tuning, descrição do assistente, diagrama do fluxo

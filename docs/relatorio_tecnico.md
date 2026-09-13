@@ -19,6 +19,12 @@ sintético/público, deixados bem explícitos no projeto:
 - **Protocolos e prontuários fictícios**: escritos por nós para simular os
   documentos internos de um hospital (nenhum dado real de paciente é usado).
 
+O adaptador LoRA final e o dataset processado foram publicados no Hugging Face
+para facilitar a reprodução pelo avaliador:
+
+- [Adaptador Qwen2.5 + LoRA](https://huggingface.co/gferreiradevv/techchallenge3-qwen25-medical-lora)
+- [Dataset MedQuAD processado](https://huggingface.co/datasets/gferreiradevv/techchallenge3-medquad-medical)
+
 ## 2. O processo de fine-tuning
 
 ### O que é fine-tuning, em termos simples

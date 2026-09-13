@@ -9,6 +9,7 @@ o RAG chain possa usar qualquer um dos dois sem mudar de assinatura.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 from typing import Any, ClassVar, Optional
 
 os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "max_split_size_mb:128")
@@ -21,6 +22,7 @@ from src.guardrails.audit_logger import AuditLogger
 
 BASE_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
 DEFAULT_ADAPTER_PATH = "outputs/models/qwen2.5-1.5b-lora-medquad-v2/final_adapter"
+HUGGINGFACE_ADAPTER_REPO = "gferreiradevv/techchallenge3-qwen25-medical-lora"
 GPU_MEMORY_FRACTION = 0.80
 
 
@@ -42,10 +44,10 @@ class LocalFineTunedLLMClient:
         self.adapter_path = adapter_path
         self.audit_logger = audit_logger or AuditLogger()
         self.max_new_tokens = max_new_tokens
-        self._ensure_model_loaded()
+        self._ensure_model_loaded(adapter_path)
 
     @classmethod
-    def _ensure_model_loaded(cls) -> None:
+    def _ensure_model_loaded(cls, adapter_path: str) -> None:
         if cls._model is not None:
             return
 
@@ -64,9 +66,10 @@ class LocalFineTunedLLMClient:
             quantization_config=bnb_config,
             device_map={"": 0} if torch.cuda.is_available() else "cpu",
         )
-        cls._model = PeftModel.from_pretrained(base_model, DEFAULT_ADAPTER_PATH)
+        adapter_source = adapter_path if Path(adapter_path).exists() else HUGGINGFACE_ADAPTER_REPO
+        cls._model = PeftModel.from_pretrained(base_model, adapter_source)
         cls._model.eval()
-        cls._loaded_adapter_path = DEFAULT_ADAPTER_PATH
+        cls._loaded_adapter_path = adapter_source
 
     def ask(
         self,
