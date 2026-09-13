@@ -167,13 +167,14 @@ python -m pytest tests/ -v
 ## Entregáveis da Fase 3
 
 - **Repositório GitHub Oficial:** [Acessar Código Fonte](https://github.com/GFerreira1902/TechChallenge3GFA)
+- **Vídeo de demonstração:** _link será incluído antes da entrega_
 - **Modelo fine-tuned:** [Qwen2.5 Medical LoRA no Hugging Face](https://huggingface.co/gferreiradevv/techchallenge3-qwen25-medical-lora)
 - **Dataset processado:** [MedQuAD Medical no Hugging Face](https://huggingface.co/datasets/gferreiradevv/techchallenge3-medquad-medical)
 - Código-fonte: pipeline de fine-tuning, integração LangChain, fluxos LangGraph;
 - Dataset anonimizado/sintético;
-- Relatório técnico: processo de fine-tuning, descrição do assistente, diagrama do fluxo
-  LangChain/LangGraph, avaliação do modelo;
-- Vídeo de demonstração (até 15 min).
+- **Relatório técnico:** [docs/relatorio_tecnico.md](docs/relatorio_tecnico.md), com o processo
+  de fine-tuning, descrição do assistente, diagrama do fluxo LangChain/LangGraph e avaliação
+  do modelo;
 
 ---
 
