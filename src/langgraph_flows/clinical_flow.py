@@ -11,6 +11,8 @@ Ao receber os dados de um paciente, o fluxo:
 """
 from __future__ import annotations
 
+import argparse
+import random
 from typing import Optional, TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -18,7 +20,7 @@ from langgraph.graph import END, START, StateGraph
 from src.guardrails.audit_logger import AuditLogger
 from src.guardrails.safety_rules import enforce_human_validation
 from src.langchain_pipeline.local_llm_client import LocalFineTunedLLMClient
-from src.langchain_pipeline.patient_records import get_patient
+from src.langchain_pipeline.patient_records import get_patient, load_patients
 from src.langchain_pipeline.rag_chain import MedicalAssistantRAG
 from src.langchain_pipeline.report_generator import gerar_laudo
 
@@ -127,6 +129,27 @@ def route_apos_alertas(state: ClinicalFlowState) -> str:
     return "emitir_alerta" if state.get("tem_alerta_critico") else "sugerir_tratamento"
 
 
+def pergunta_para_paciente(paciente: dict) -> str:
+    """Cria uma pergunta coerente com o diagnóstico do paciente sorteado."""
+    return (
+        f"Quais são as próximas condutas recomendadas para o diagnóstico de "
+        f"{paciente['diagnostico_principal']}?"
+    )
+
+
+def selecionar_paciente(paciente_id: Optional[str] = None) -> tuple[str, str]:
+    """Seleciona um paciente manualmente ou sorteia um dos prontuários fictícios."""
+    pacientes = load_patients()
+    if paciente_id:
+        if paciente_id not in pacientes:
+            raise ValueError(f"Paciente {paciente_id} nao encontrado no prontuario.")
+        paciente = pacientes[paciente_id]
+    else:
+        paciente = random.choice(list(pacientes.values()))
+
+    return paciente["paciente_id"], pergunta_para_paciente(paciente)
+
+
 def build_clinical_flow():
     graph = StateGraph(ClinicalFlowState)
 
@@ -155,6 +178,16 @@ def build_clinical_flow():
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Executa o fluxo clínico com paciente fictício.")
+    parser.add_argument(
+        "--paciente-id",
+        help="Usa um paciente específico; sem esse argumento, sorteia um paciente a cada execução.",
+    )
+    args = parser.parse_args()
+    paciente_id, pergunta = selecionar_paciente(args.paciente_id)
+    print(f"Paciente selecionado: {paciente_id}")
+    print(f"Problema selecionado: {pergunta}\n")
+
     flow = build_clinical_flow()
-    resultado = flow.invoke({"paciente_id": "PAC-001"})
+    resultado = flow.invoke({"paciente_id": paciente_id, "pergunta": pergunta})
     print(resultado["resumo"])

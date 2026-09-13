@@ -133,6 +133,13 @@ python -m src.langchain_pipeline.rag_chain
 python -m src.langgraph_flows.clinical_flow
 ```
 
+Sem argumentos, o fluxo sorteia um paciente fictício e cria uma pergunta de
+acordo com o diagnóstico dele a cada execução. Para repetir um cenário:
+
+```powershell
+python -m src.langgraph_flows.clinical_flow --paciente-id PAC-002
+```
+
 ### 6. Rodar a demonstração completa (recomendado para conferir tudo de uma vez)
 
 ```powershell

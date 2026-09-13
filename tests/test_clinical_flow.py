@@ -10,7 +10,9 @@ from src.langgraph_flows.clinical_flow import (
     node_sugerir_tratamento,
     node_verificar_alertas,
     node_verificar_exames_pendentes,
+    pergunta_para_paciente,
     route_apos_alertas,
+    selecionar_paciente,
 )
 
 FAKE_PATIENT = {
@@ -32,6 +34,49 @@ def test_node_receber_paciente_levanta_erro_para_paciente_inexistente():
     with patch("src.langgraph_flows.clinical_flow.get_patient", return_value=None):
         with pytest.raises(ValueError):
             node_receber_paciente({"paciente_id": "PAC-INEXISTENTE"})
+
+
+def test_pergunta_para_paciente_usa_diagnostico():
+    pergunta = pergunta_para_paciente(FAKE_PATIENT)
+
+    assert "Dor toracica" in pergunta
+    assert pergunta.endswith("?")
+
+
+def test_selecionar_paciente_respeita_id_informado(tmp_path, monkeypatch):
+    patients_path = tmp_path / "patients.json"
+    patients_path.write_text(
+        '{"pacientes": [{"paciente_id": "PAC-TEST", "diagnostico_principal": "Sepse"}]}',
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        "src.langgraph_flows.clinical_flow.load_patients",
+        lambda: {"PAC-TEST": {"paciente_id": "PAC-TEST", "diagnostico_principal": "Sepse"}},
+    )
+
+    paciente_id, pergunta = selecionar_paciente("PAC-TEST")
+
+    assert paciente_id == "PAC-TEST"
+    assert "Sepse" in pergunta
+
+
+def test_selecionar_paciente_sorteia_quando_id_nao_informado(monkeypatch):
+    monkeypatch.setattr(
+        "src.langgraph_flows.clinical_flow.load_patients",
+        lambda: {
+            "PAC-A": {"paciente_id": "PAC-A", "diagnostico_principal": "Apendicite"},
+            "PAC-B": {"paciente_id": "PAC-B", "diagnostico_principal": "Sepse"},
+        },
+    )
+    monkeypatch.setattr(
+        "src.langgraph_flows.clinical_flow.random.choice",
+        lambda patients: patients[1],
+    )
+
+    paciente_id, pergunta = selecionar_paciente()
+
+    assert paciente_id == "PAC-B"
+    assert "Sepse" in pergunta
 
 
 def test_node_verificar_exames_pendentes_detecta_exame():
