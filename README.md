@@ -45,7 +45,7 @@ próprios (sintéticos/anonimizados) do hospital, capaz de:
 - **Geração de documentos:** `src/langchain_pipeline/report_generator.py` gera um laudo
   clínico formatado (modelo de referência em `data/raw/synthetic_laudo_template.md`),
   já integrado como etapa do fluxo LangGraph.
-- **Qualidade:** `Pytest` (31 testes cobrindo RAG, LangGraph, guardrails, geração de
+- **Qualidade:** `Pytest` (34 testes cobrindo RAG, LangGraph, guardrails, geração de
   laudo e prontuários).
 
 ## Estrutura do Projeto
@@ -82,7 +82,7 @@ TechChallenge3GFA/
 │   │   ├── safety_rules.py      # Bloqueio de prescrição direta / disclaimer
 │   │   └── audit_logger.py      # Log de auditoria
 │   └── demo.py                  # Roteiro de demonstração ponta a ponta
-├── tests/                # 31 testes pytest
+├── tests/                # 34 testes pytest
 ├── requirements.txt
 └── README.md
 ```
@@ -156,7 +156,7 @@ e os logs de auditoria. Os PDFs ficam em `outputs/reports/`.
 python -m pytest tests/ -v
 ```
 
-31 testes, cobrindo `rag_chain`, `clinical_flow`, `report_generator`, `safety_rules`,
+34 testes, cobrindo `rag_chain`, `clinical_flow`, `report_generator`, `safety_rules`,
 `patient_records`, `llm_client` e `audit_logger` (todos com mocks — não exigem GPU nem rede).
 
 ## Entregáveis da Fase 3

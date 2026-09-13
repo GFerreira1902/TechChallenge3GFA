@@ -107,8 +107,8 @@ paciente, o sistema:
    estrutura fixa (seguindo um modelo de referência que criamos em
    `data/raw/synthetic_laudo_template.md`) — atendendo ao pedido do enunciado
    por "modelos de laudos, receitas e procedimentos internos" como um dos
-  tipos de saída esperados do assistente. Além do texto no resumo, o documento
-  é exportado para PDF em `outputs/reports/`, com fonte compatível com acentos.
+   tipos de saída esperados do assistente. Além do texto no resumo, o documento
+   é exportado para PDF em `outputs/reports/`, com fonte compatível com acentos.
 7. **Aplica guardrails de segurança**: o sistema verifica se a resposta soa
    como uma prescrição direta e imperativa (por exemplo, "tome 500mg de X") e,
    se detectar isso, reforça um aviso. Toda resposta clínica recebe
@@ -119,10 +119,19 @@ paciente, o sistema:
    um log (`outputs/audit_log.json`), permitindo rastrear depois o que foi
    perguntado, o que foi respondido e com base em quê.
 
-Esse fluxo de decisão (passos 1 a 7) é orquestrado com **LangGraph**, uma
+Esse fluxo de decisão (passos 1 a 8) é orquestrado com **LangGraph**, uma
 ferramenta feita para descrever processos com etapas e decisões condicionais
 (por exemplo: "se houver alerta crítico, faça X; senão, pule direto para Y").
 A busca e geração de resposta (RAG) usa **LangChain**.
+
+Para reduzir respostas fora do contexto, cada prontuário sintético também
+declara os protocolos que podem ser usados naquele caso. Assim, um paciente
+com sepse prioriza o PROT-002, um paciente com apendicite usa o PROT-005 e um
+paciente com insuficiência cardíaca usa o PROT-011. Essa lista evita que o
+modelo misture protocolos de especialidades diferentes.
+
+Os alertas gerais do prontuário são separados dos alertas críticos. Apenas os
+itens classificados como críticos acionam o aviso automático para a equipe.
 
 ## 4. Diagrama do fluxo
 
@@ -141,9 +150,11 @@ flowchart TD
     G -->|Não| F[Busca protocolos relevantes]
     H --> F
     F --> I[Modelo fine-tuned gera a resposta]
-    I --> J[Guardrail: checa prescrição direta + aviso de validação humana]
-    J --> K[Resposta final, com fontes citadas]
-    K --> L[Tudo registrado no log de auditoria]
+    I --> J[Conduta principal ancorada no protocolo]
+    J --> K[Guardrail: checa prescrição direta + aviso de validação humana]
+    K --> L[Gera laudo clínico e PDF]
+    L --> M[Resposta final, com fontes citadas]
+    M --> N[Tudo registrado no log de auditoria]
 ```
 
 ## 5. Avaliação do modelo e análise dos resultados
@@ -174,6 +185,17 @@ de protocolo + prontuário do paciente), e a resposta ficou bem alinhada ao
 protocolo interno correto, citando os passos concretos do "pacote da primeira
 hora" (coleta de lactato, hemoculturas antes do antibiótico, reposição
 volêmica, etc.).
+
+Durante a validação dos casos sorteados, encontramos um risco importante:
+um modelo pequeno pode misturar protocolos de especialidades diferentes ou
+repetir uma recomendação genérica. Para reduzir esse risco, cada prontuário
+fictício passou a declarar seus protocolos autorizados. O fluxo também separa
+alertas informativos de alertas críticos e ancora a conduta principal no
+conteúdo do protocolo, usando a resposta livre do modelo apenas como apoio.
+Depois dessa correção, os casos de AVC, dor torácica e insuficiência cardíaca
+passaram a citar somente os protocolos previstos para cada paciente. Essa
+decisão não transforma o sistema em uma ferramenta clínica real, mas reduz a
+chance de uma resposta inventada ser apresentada como conduta.
 
 ### Uma limitação encontrada, documentada com transparência
 

@@ -11,9 +11,10 @@ flowchart TD
     A[Médico / Profissional de saúde] -->|pergunta + paciente_id| B(LangGraph: Fluxo de Decisão Clínica)
     B --> C[Prontuário do paciente<br/>data/raw/synthetic_patients.json]
     B --> D[Pipeline RAG - LangChain]
-    D --> E[Base de conhecimento FAISS<br/>protocolos internos sintéticos]
+    D --> E[Base de conhecimento FAISS<br/>protocolos autorizados por paciente]
     D --> F[LLM customizado<br/>Qwen2.5-1.5B + LoRA fine-tuned em MedQuAD]
     B --> G[Guardrails<br/>validação humana / bloqueio de prescrição direta]
+    B --> J[Laudo clínico em PDF<br/>outputs/reports/]
     B --> H[Auditoria<br/>outputs/audit_log.json]
     B --> I[Resumo final do atendimento]
     I --> A
@@ -74,14 +75,15 @@ sequenceDiagram
     participant Audit as AuditLogger
 
     Flow->>RAG: ask(pergunta, paciente_id)
-    RAG->>FAISS: similarity_search(pergunta, k=3)
-    FAISS-->>RAG: protocolos relevantes (PROT-XXX)
+    RAG->>FAISS: busca semântica + termos clínicos
+    FAISS-->>RAG: protocolos autorizados do paciente
     RAG->>RAG: monta prompt (protocolos + contexto do paciente)
     RAG->>LLM: ask(system_prompt, user_message)
     LLM->>Audit: log(prompt, resposta, fontes)
     LLM-->>RAG: resposta gerada
     RAG-->>Flow: resposta + fontes citadas
-    Flow->>Guard: enforce_human_validation(resposta)
+    Flow->>Flow: ancora conduta no protocolo principal
+    Flow->>Guard: enforce_human_validation(conduta)
     Guard-->>Flow: resposta com disclaimer + avisos
 ```
 
@@ -94,6 +96,7 @@ sequenceDiagram
 | Prontuários          | `src/langchain_pipeline/patient_records.py` | Consulta estruturada aos dados fictícios de pacientes                            |
 | Cliente LLM          | `src/langchain_pipeline/llm_client.py`      | Chamada ao LLM (Groq/fine-tuned) com fallback seguro                             |
 | RAG                  | `src/langchain_pipeline/rag_chain.py`       | Orquestra retrieval + contexto do paciente + geração + citação de fontes         |
-| Fluxo de decisão     | `src/langgraph_flows/clinical_flow.py`      | Orquestra exames pendentes → alertas → sugestão → resumo (LangGraph)             |
+| Fluxo de decisão     | `src/langgraph_flows/clinical_flow.py`      | Orquestra exames pendentes → alertas → conduta protocolar → laudo (LangGraph)    |
+| Laudo/PDF            | `src/langchain_pipeline/report_generator.py` | Gera o documento estruturado e exporta o PDF                                    |
 | Guardrails           | `src/guardrails/safety_rules.py`            | Bloqueia linguagem de prescrição direta e garante disclaimer de validação humana |
 | Auditoria            | `src/guardrails/audit_logger.py`            | Log JSON de toda interação (explicabilidade/rastreabilidade)                     |
