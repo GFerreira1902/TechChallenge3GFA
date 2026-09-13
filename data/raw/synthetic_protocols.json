@@ -60,6 +60,12 @@
       "titulo": "Protocolo de Comunicacao de Alertas Criticos da Equipe Medica",
       "categoria": "seguranca_do_paciente",
       "conteudo": "Resultados de exames criticos (potassio serico critico, hemoglobina < 7 g/dL, saturacao de oxigenio < 90% persistente, troponina positiva) devem gerar alerta imediato para o medico assistente e o enfermeiro responsavel, com registro do horario de emissao e confirmacao de recebimento. Nenhum alerta critico deve ficar sem resposta documentada por mais de 30 minutos."
+    },
+    {
+      "protocol_id": "PROT-011",
+      "titulo": "Protocolo de Manejo Inicial da Insuficiencia Cardiaca Descompensada",
+      "categoria": "cardiologia",
+      "conteudo": "Na suspeita de insuficiencia cardiaca descompensada, avaliar sinais vitais, perfusao periferica, congestao pulmonar e edema. Solicitar ECG, radiografia de torax, hemograma, funcao renal, sodio, potassio e troponina conforme avaliacao clinica. Monitorar saturacao de oxigenio e administrar oxigenio apenas se houver hipoxemia. Em pacientes com sinais de congestao, considerar diuretico de alca conforme avaliacao e prescricao do medico responsavel. Reavaliar diurese, peso, funcao renal e eletrolitos apos a intervencao. Toda conduta deve ser validada pela equipe de cardiologia ou pelo medico assistente."
     }
   ]
 }
