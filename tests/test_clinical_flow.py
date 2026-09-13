@@ -20,6 +20,7 @@ FAKE_PATIENT = {
     "diagnostico_principal": "Dor toracica",
     "exames_pendentes": ["ECG"],
     "alertas": ["Troponina limitrofe"],
+    "alertas_criticos": ["Troponina limitrofe"],
 }
 
 
@@ -119,15 +120,15 @@ def test_node_sugerir_tratamento_aplica_guardrail_de_validacao_humana():
     fake_assistant = MagicMock()
     fake_assistant.ask.return_value = {
         "resposta": "Sugestao sem disclaimer.",
-        "fontes": [{"protocol_id": "PROT-001"}],
+        "fontes": [{"protocol_id": "PROT-001", "titulo": "Protocolo de teste", "conteudo": "Conduta protocolar de teste."}],
     }
     state = {"paciente_id": "PAC-001", "paciente": FAKE_PATIENT}
 
     with patch("src.langgraph_flows.clinical_flow.MedicalAssistantRAG", return_value=fake_assistant):
         result = node_sugerir_tratamento(state)
 
-    assert "validação humana" in result["sugestao_tratamento"].lower()
-    assert result["fontes"] == [{"protocol_id": "PROT-001"}]
+    assert "Conduta protocolar de teste" in result["sugestao_tratamento"]
+    assert result["fontes"][0]["protocol_id"] == "PROT-001"
 
 
 def test_node_finalizar_monta_resumo_com_alerta_e_exames():

@@ -77,9 +77,23 @@ class MedicalAssistantRAG:
             for doc in docs
         ]
 
+    def _retrieve_for_patient(self, question: str, paciente_id: Optional[str]) -> list[dict]:
+        """Prioriza os protocolos explicitamente associados ao prontuario ficticio."""
+        patient = get_patient(paciente_id) if paciente_id else None
+        protocol_ids = patient.get("protocolos_relevantes", []) if patient else []
+        if not protocol_ids:
+            return self._retrieve(question)
+
+        documents = {doc.metadata["protocol_id"]: doc for doc in load_protocol_documents_for_search()}
+        preferred = [documents[protocol_id] for protocol_id in protocol_ids if protocol_id in documents]
+        return [
+            {"protocol_id": doc.metadata["protocol_id"], "titulo": doc.metadata["titulo"], "conteudo": doc.page_content}
+            for doc in preferred
+        ][: self.top_k]
+
     def ask(self, question: str, paciente_id: Optional[str] = None) -> dict[str, Any]:
         """Responde a pergunta clinica com base nos protocolos (+ prontuario, se informado)."""
-        sources = self._retrieve(question)
+        sources = self._retrieve_for_patient(question, paciente_id)
         protocolos_texto = "\n\n".join(
             f"[{s['protocol_id']}] {s['titulo']}\n{s['conteudo']}" for s in sources
         )

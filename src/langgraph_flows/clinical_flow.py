@@ -55,7 +55,7 @@ def node_verificar_exames_pendentes(state: ClinicalFlowState) -> dict:
 
 
 def node_verificar_alertas(state: ClinicalFlowState) -> dict:
-    alertas = state["paciente"]["alertas"]
+    alertas = state["paciente"].get("alertas_criticos", [])
     return {"alertas_criticos": alertas, "tem_alerta_critico": len(alertas) > 0}
 
 
@@ -83,10 +83,19 @@ def node_sugerir_tratamento(state: ClinicalFlowState) -> dict:
     assistant = MedicalAssistantRAG()
     resultado = assistant.ask(pergunta, paciente_id=state["paciente_id"])
 
-    resposta_validada, avisos = enforce_human_validation(resultado["resposta"])
+    fontes = resultado["fontes"]
+    if fontes and fontes[0].get("conteudo"):
+        resposta_baseada_em_protocolo = (
+            f"Conforme {fontes[0]['protocol_id']} - {fontes[0]['titulo']}: "
+            f"{fontes[0]['conteudo']}"
+        )
+    else:
+        resposta_baseada_em_protocolo = resultado["resposta"]
+
+    resposta_validada, avisos = enforce_human_validation(resposta_baseada_em_protocolo)
     return {
         "sugestao_tratamento": resposta_validada,
-        "fontes": resultado["fontes"],
+        "fontes": fontes,
         "avisos_seguranca": avisos,
     }
 
