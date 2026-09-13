@@ -24,6 +24,60 @@ from src.guardrails.safety_rules import enforce_human_validation
 REPORTS_DIR = Path("outputs/reports")
 
 
+def _format_report_text(
+    paciente: dict,
+    timestamp: datetime,
+    sugestao_tratamento: str,
+    fontes: list[dict],
+    alerta_emitido: Optional[str],
+    llm_text: str,
+) -> str:
+    """Monta o documento com campos objetivos e o texto do modelo como complemento."""
+    exames = paciente.get("exames_pendentes", [])
+    exames_texto = "; ".join(exames) if exames else "Nenhum exame pendente."
+    protocolos = ", ".join(f["protocol_id"] for f in fontes) or "Nenhum protocolo identificado."
+    condutas = [
+        f"Sugestão retornada pelo pipeline RAG: {sugestao_tratamento.strip()}",
+        f"Revisar os exames pendentes: {exames_texto}",
+        f"Consultar os protocolos internos: {protocolos}",
+    ]
+    if alerta_emitido:
+        condutas.append("Comunicar e acompanhar o alerta crítico registrado para a equipe responsável.")
+    condutas.append("Validar qualquer conduta com o profissional de saúde responsável.")
+
+    complemento = llm_text.strip()
+    if complemento:
+        condutas.append(f"Complemento gerado pelo assistente: {complemento}")
+
+    return "\n".join(
+        [
+            "LAUDO CLÍNICO",
+            f"Paciente: {paciente['paciente_id']}",
+            f"Data: {timestamp:%d/%m/%Y}",
+            f"Hora: {timestamp:%H:%M:%S}",
+            "",
+            "1. Diagnóstico principal:",
+            paciente["diagnostico_principal"],
+            "",
+            "2. Exames pendentes ou realizados:",
+            exames_texto,
+            "",
+            "3. Conduta sugerida:",
+            "\n".join(f"- {conduta}" for conduta in condutas),
+            "",
+            "4. Protocolos internos consultados (fonte):",
+            protocolos,
+            "",
+            "5. Alertas ativos:",
+            alerta_emitido or "Nenhum alerta ativo.",
+            "",
+            "[AVISO] Documento gerado automaticamente. Não substitui a avaliação clínica "
+            "de um profissional de saúde responsável. Nenhuma conduta deve ser executada "
+            "sem validação humana.",
+        ]
+    )
+
+
 def _register_fonts() -> tuple[str, str]:
     regular_path = Path("C:/Windows/Fonts/arial.ttf")
     bold_path = Path("C:/Windows/Fonts/arialbd.ttf")
@@ -52,7 +106,7 @@ def salvar_laudo_pdf(laudo: str, paciente_id: str, timestamp: datetime) -> str:
     )
     heading_style = ParagraphStyle(
         "ReportHeading", parent=body_style, fontName=bold_font,
-        spaceBefore=8, spaceAfter=5,
+        fontSize=14, leading=18, spaceBefore=12, spaceAfter=7,
     )
 
     story = []
@@ -127,9 +181,17 @@ def gerar_laudo(
     )
 
     laudo_validado, avisos = enforce_human_validation(laudo_bruto)
-    pdf_path = salvar_laudo_pdf(laudo_validado, paciente["paciente_id"], timestamp)
+    laudo_formatado = _format_report_text(
+        paciente=paciente,
+        timestamp=timestamp,
+        sugestao_tratamento=sugestao_tratamento,
+        fontes=fontes,
+        alerta_emitido=alerta_emitido,
+        llm_text=laudo_validado,
+    )
+    pdf_path = salvar_laudo_pdf(laudo_formatado, paciente["paciente_id"], timestamp)
     return {
-        "laudo": laudo_validado,
+        "laudo": laudo_formatado,
         "avisos_seguranca": avisos,
         "pdf_path": pdf_path,
     }
