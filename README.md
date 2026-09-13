@@ -12,6 +12,7 @@ próprios (sintéticos/anonimizados) do hospital, capaz de:
 
 - Responder dúvidas clínicas de médicos com base em protocolos internos;
 - Sugerir procedimentos com base em protocolos e histórico do paciente;
+- Gerar automaticamente um laudo clínico formatado a partir do atendimento;
 - Orquestrar fluxos de decisão automatizados e seguros (verificação de exames pendentes,
   sugestão de tratamento, emissão de alertas) via **LangGraph**;
 - Garantir explicabilidade (fonte da informação) e auditoria (logging) de cada resposta.
@@ -41,16 +42,21 @@ próprios (sintéticos/anonimizados) do hospital, capaz de:
   e garante disclaimer de validação humana; `src/guardrails/audit_logger.py` audita
   toda interação em `outputs/audit_log.json`.
 - **Interface:** CLI (scripts em `src/`); ver `src/demo.py` para um roteiro completo.
-- **Qualidade:** `Pytest` (27 testes cobrindo RAG, LangGraph, guardrails e prontuários).
+- **Geração de documentos:** `src/langchain_pipeline/report_generator.py` gera um laudo
+  clínico formatado (modelo de referência em `data/raw/synthetic_laudo_template.md`),
+  já integrado como etapa do fluxo LangGraph.
+- **Qualidade:** `Pytest` (31 testes cobrindo RAG, LangGraph, guardrails, geração de
+  laudo e prontuários).
 
 ## Estrutura do Projeto
 
 ```
 TechChallenge3GFA/
 ├── data/
-│   ├── raw/synthetic_protocols.json   # Protocolos internos fictícios (base do RAG)
-│   ├── raw/synthetic_patients.json    # Prontuários fictícios
-│   └── processed/                     # MedQuAD limpo/amostrado (gerado, não versionado)
+│   ├── raw/synthetic_protocols.json      # Protocolos internos fictícios (base do RAG)
+│   ├── raw/synthetic_patients.json       # Prontuários fictícios
+│   ├── raw/synthetic_laudo_template.md   # Modelo de laudo clínico (referencia)
+│   └── processed/                        # MedQuAD limpo/amostrado (gerado, não versionado)
 ├── docs/
 │   ├── diagrama_fluxo.md      # Diagrama do fluxo LangChain/LangGraph (Mermaid)
 │   └── reference/             # Material de referência da Fase 2
@@ -67,14 +73,15 @@ TechChallenge3GFA/
 │   │   ├── patient_records.py   # Consulta ao prontuário sintético
 │   │   ├── llm_client.py        # Cliente Groq (Fase 2, fallback)
 │   │   ├── local_llm_client.py  # Cliente do LLM fine-tuned local (padrão do RAG)
-│   │   └── rag_chain.py         # Pipeline RAG completo
+│   │   ├── rag_chain.py         # Pipeline RAG completo
+│   │   └── report_generator.py # Geração do laudo clínico formatado
 │   ├── langgraph_flows/
 │   │   └── clinical_flow.py     # Fluxo de decisão clínica (LangGraph)
 │   ├── guardrails/
 │   │   ├── safety_rules.py      # Bloqueio de prescrição direta / disclaimer
 │   │   └── audit_logger.py      # Log de auditoria
 │   └── demo.py                  # Roteiro de demonstração ponta a ponta
-├── tests/                # 27 testes pytest
+├── tests/                # 31 testes pytest
 ├── requirements.txt
 └── README.md
 ```
@@ -140,8 +147,8 @@ LangGraph, uma pergunta clínica contextualizada via RAG e os logs de auditoria.
 python -m pytest tests/ -v
 ```
 
-27 testes, cobrindo `rag_chain`, `clinical_flow`, `safety_rules`, `patient_records`,
-`llm_client` e `audit_logger` (todos com mocks — não exigem GPU nem rede).
+31 testes, cobrindo `rag_chain`, `clinical_flow`, `report_generator`, `safety_rules`,
+`patient_records`, `llm_client` e `audit_logger` (todos com mocks — não exigem GPU nem rede).
 
 ## Entregáveis da Fase 3
 

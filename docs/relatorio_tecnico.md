@@ -102,17 +102,23 @@ paciente, o sistema:
    contexto combinando protocolo + dados do paciente.
 5. **Gera a resposta** usando o modelo fine-tuned, sempre citando de qual
    protocolo a informação veio (para explicabilidade).
-6. **Aplica guardrails de segurança**: o sistema verifica se a resposta soa
+6. **Redige um laudo clínico formatado**, reunindo diagnóstico, exames,
+   conduta sugerida, protocolos consultados e alertas em um documento com
+   estrutura fixa (seguindo um modelo de referência que criamos em
+   `data/raw/synthetic_laudo_template.md`) — atendendo ao pedido do enunciado
+   por "modelos de laudos, receitas e procedimentos internos" como um dos
+   tipos de saída esperados do assistente.
+7. **Aplica guardrails de segurança**: o sistema verifica se a resposta soa
    como uma prescrição direta e imperativa (por exemplo, "tome 500mg de X") e,
    se detectar isso, reforça um aviso. Toda resposta clínica recebe
    automaticamente um aviso de que precisa de validação humana antes de
    qualquer conduta — o assistente nunca substitui o julgamento do
    profissional de saúde.
-7. **Audita tudo**: cada pergunta, resposta, fonte usada e metadado é salvo em
+8. **Audita tudo**: cada pergunta, resposta, fonte usada e metadado é salvo em
    um log (`outputs/audit_log.json`), permitindo rastrear depois o que foi
    perguntado, o que foi respondido e com base em quê.
 
-Esse fluxo de decisão (passos 1 a 6) é orquestrado com **LangGraph**, uma
+Esse fluxo de decisão (passos 1 a 7) é orquestrado com **LangGraph**, uma
 ferramenta feita para descrever processos com etapas e decisões condicionais
 (por exemplo: "se houver alerta crítico, faça X; senão, pule direto para Y").
 A busca e geração de resposta (RAG) usa **LangChain**.

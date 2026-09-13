@@ -31,7 +31,8 @@ stateDiagram-v2
     verificar_alertas --> emitir_alerta: tem_alerta_critico = true
     verificar_alertas --> sugerir_tratamento: tem_alerta_critico = false
     emitir_alerta --> sugerir_tratamento
-    sugerir_tratamento --> finalizar
+    sugerir_tratamento --> gerar_laudo
+    gerar_laudo --> finalizar
     finalizar --> [*]
 
     note right of receber_paciente
@@ -42,6 +43,13 @@ stateDiagram-v2
     note right of emitir_alerta
         Registra alerta crítico via AuditLogger
         (ex.: PROT-010 - alertas críticos)
+    end note
+
+    note right of gerar_laudo
+        Gera o laudo clínico formatado
+        (src/langchain_pipeline/report_generator.py),
+        seguindo o modelo em
+        data/raw/synthetic_laudo_template.md
     end note
 
     note right of sugerir_tratamento

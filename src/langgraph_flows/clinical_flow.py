@@ -6,7 +6,8 @@ Ao receber os dados de um paciente, o fluxo:
 3. Verifica alertas criticos e, se houver, emite alerta para a equipe (auditado);
 4. Sugere conduta/tratamento via RAG sobre os protocolos internos, sempre com
    validacao humana obrigatoria (guardrails);
-5. Consolida um resumo final do atendimento.
+5. Gera um laudo clinico formatado (documento) com base no atendimento;
+6. Consolida um resumo final do atendimento.
 """
 from __future__ import annotations
 
@@ -16,8 +17,10 @@ from langgraph.graph import END, START, StateGraph
 
 from src.guardrails.audit_logger import AuditLogger
 from src.guardrails.safety_rules import enforce_human_validation
+from src.langchain_pipeline.local_llm_client import LocalFineTunedLLMClient
 from src.langchain_pipeline.patient_records import get_patient
 from src.langchain_pipeline.rag_chain import MedicalAssistantRAG
+from src.langchain_pipeline.report_generator import gerar_laudo
 
 
 class ClinicalFlowState(TypedDict, total=False):
@@ -32,6 +35,7 @@ class ClinicalFlowState(TypedDict, total=False):
     sugestao_tratamento: Optional[str]
     fontes: list[dict]
     avisos_seguranca: list[str]
+    laudo: Optional[str]
     resumo: str
 
 
@@ -84,6 +88,18 @@ def node_sugerir_tratamento(state: ClinicalFlowState) -> dict:
     }
 
 
+def node_gerar_laudo(state: ClinicalFlowState, llm_client: Optional[object] = None) -> dict:
+    llm_client = llm_client or LocalFineTunedLLMClient()
+    resultado = gerar_laudo(
+        llm_client=llm_client,
+        paciente=state["paciente"],
+        sugestao_tratamento=state["sugestao_tratamento"],
+        fontes=state.get("fontes", []),
+        alerta_emitido=state.get("alerta_emitido"),
+    )
+    return {"laudo": resultado["laudo"]}
+
+
 def node_finalizar(state: ClinicalFlowState) -> dict:
     linhas = [f"Resumo do atendimento - Paciente {state['paciente_id']}"]
 
@@ -100,6 +116,7 @@ def node_finalizar(state: ClinicalFlowState) -> dict:
     linhas.append(f"Sugestão de conduta: {state['sugestao_tratamento']}")
     fontes = ", ".join(f["protocol_id"] for f in state.get("fontes", []))
     linhas.append(f"Fontes consultadas: {fontes or 'nenhuma'}")
+    linhas.append(f"\nLaudo clínico gerado:\n{state.get('laudo', 'nao gerado')}")
 
     return {"resumo": "\n".join(linhas)}
 
@@ -116,6 +133,7 @@ def build_clinical_flow():
     graph.add_node("verificar_alertas", node_verificar_alertas)
     graph.add_node("emitir_alerta", node_emitir_alerta)
     graph.add_node("sugerir_tratamento", node_sugerir_tratamento)
+    graph.add_node("gerar_laudo", node_gerar_laudo)
     graph.add_node("finalizar", node_finalizar)
 
     graph.add_edge(START, "receber_paciente")
@@ -127,7 +145,8 @@ def build_clinical_flow():
         {"emitir_alerta": "emitir_alerta", "sugerir_tratamento": "sugerir_tratamento"},
     )
     graph.add_edge("emitir_alerta", "sugerir_tratamento")
-    graph.add_edge("sugerir_tratamento", "finalizar")
+    graph.add_edge("sugerir_tratamento", "gerar_laudo")
+    graph.add_edge("gerar_laudo", "finalizar")
     graph.add_edge("finalizar", END)
 
     return graph.compile()

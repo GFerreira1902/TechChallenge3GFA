@@ -45,6 +45,7 @@ data/raw/*
 !data/raw/.gitkeep
 !data/raw/synthetic_protocols.json
 !data/raw/synthetic_patients.json
+!data/raw/synthetic_laudo_template.md
 data/processed/*
 !data/processed/.gitkeep
 

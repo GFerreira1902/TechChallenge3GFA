@@ -5,6 +5,7 @@ import pytest
 from src.langgraph_flows.clinical_flow import (
     node_emitir_alerta,
     node_finalizar,
+    node_gerar_laudo,
     node_receber_paciente,
     node_sugerir_tratamento,
     node_verificar_alertas,
@@ -92,6 +93,7 @@ def test_node_finalizar_monta_resumo_com_alerta_e_exames():
         "alerta_emitido": "ALERTA CRITICO - Paciente PAC-001",
         "sugestao_tratamento": "Sugestao final.",
         "fontes": [{"protocol_id": "PROT-001"}],
+        "laudo": "LAUDO CLINICO de teste",
     }
 
     result = node_finalizar(state)
@@ -100,3 +102,30 @@ def test_node_finalizar_monta_resumo_com_alerta_e_exames():
     assert "ECG" in result["resumo"]
     assert "ALERTA CRITICO" in result["resumo"]
     assert "PROT-001" in result["resumo"]
+    assert "LAUDO CLINICO de teste" in result["resumo"]
+
+
+def test_node_gerar_laudo_usa_report_generator_e_retorna_laudo():
+    fake_llm = MagicMock()
+    state = {
+        "paciente_id": "PAC-001",
+        "paciente": FAKE_PATIENT,
+        "sugestao_tratamento": "Sugestao final.",
+        "fontes": [{"protocol_id": "PROT-001"}],
+        "alerta_emitido": None,
+    }
+
+    with patch(
+        "src.langgraph_flows.clinical_flow.gerar_laudo",
+        return_value={"laudo": "LAUDO CLINICO gerado.", "avisos_seguranca": []},
+    ) as mock_gerar_laudo:
+        result = node_gerar_laudo(state, llm_client=fake_llm)
+
+    assert result["laudo"] == "LAUDO CLINICO gerado."
+    mock_gerar_laudo.assert_called_once_with(
+        llm_client=fake_llm,
+        paciente=FAKE_PATIENT,
+        sugestao_tratamento="Sugestao final.",
+        fontes=[{"protocol_id": "PROT-001"}],
+        alerta_emitido=None,
+    )
