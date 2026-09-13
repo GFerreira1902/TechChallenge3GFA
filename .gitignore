@@ -60,6 +60,8 @@ outputs/models/*
 # ========================================
 outputs/audit_log.json
 outputs/llm_history.json
+outputs/reports/*
+!outputs/reports/.gitkeep
 
 # ========================================
 # Kaggle

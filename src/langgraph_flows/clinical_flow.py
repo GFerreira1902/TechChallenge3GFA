@@ -36,6 +36,7 @@ class ClinicalFlowState(TypedDict, total=False):
     fontes: list[dict]
     avisos_seguranca: list[str]
     laudo: Optional[str]
+    laudo_pdf_path: Optional[str]
     resumo: str
 
 
@@ -97,7 +98,7 @@ def node_gerar_laudo(state: ClinicalFlowState, llm_client: Optional[object] = No
         fontes=state.get("fontes", []),
         alerta_emitido=state.get("alerta_emitido"),
     )
-    return {"laudo": resultado["laudo"]}
+    return {"laudo": resultado["laudo"], "laudo_pdf_path": resultado["pdf_path"]}
 
 
 def node_finalizar(state: ClinicalFlowState) -> dict:
@@ -116,6 +117,7 @@ def node_finalizar(state: ClinicalFlowState) -> dict:
     linhas.append(f"Sugestão de conduta: {state['sugestao_tratamento']}")
     fontes = ", ".join(f["protocol_id"] for f in state.get("fontes", []))
     linhas.append(f"Fontes consultadas: {fontes or 'nenhuma'}")
+    linhas.append(f"PDF do laudo: {state.get('laudo_pdf_path', 'nao gerado')}")
     linhas.append(f"\nLaudo clínico gerado:\n{state.get('laudo', 'nao gerado')}")
 
     return {"resumo": "\n".join(linhas)}

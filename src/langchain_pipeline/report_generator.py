@@ -6,9 +6,76 @@ assistente (o modelo de referencia esta em data/raw/synthetic_laudo_template.md)
 from __future__ import annotations
 
 from datetime import datetime
+from pathlib import Path
+import re
 from typing import Any, Optional
+from xml.sax.saxutils import escape
+
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import cm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 from src.guardrails.safety_rules import enforce_human_validation
+
+REPORTS_DIR = Path("outputs/reports")
+
+
+def _register_fonts() -> tuple[str, str]:
+    regular_path = Path("C:/Windows/Fonts/arial.ttf")
+    bold_path = Path("C:/Windows/Fonts/arialbd.ttf")
+    if regular_path.exists() and bold_path.exists():
+        pdfmetrics.registerFont(TTFont("Arial", str(regular_path)))
+        pdfmetrics.registerFont(TTFont("Arial-Bold", str(bold_path)))
+        return "Arial", "Arial-Bold"
+    return "Helvetica", "Helvetica-Bold"
+
+
+def salvar_laudo_pdf(laudo: str, paciente_id: str, timestamp: datetime) -> str:
+    """Salva o texto do laudo como PDF e retorna o caminho gerado."""
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    safe_id = re.sub(r"[^A-Za-z0-9_-]", "_", paciente_id)
+    pdf_path = REPORTS_DIR / f"laudo_{safe_id}_{timestamp:%Y%m%d_%H%M%S}.pdf"
+    regular_font, bold_font = _register_fonts()
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        "ReportTitle", parent=styles["Title"], fontName=bold_font,
+        alignment=TA_CENTER, spaceAfter=18,
+    )
+    body_style = ParagraphStyle(
+        "ReportBody", parent=styles["BodyText"], fontName=regular_font,
+        leading=15, spaceAfter=8,
+    )
+    heading_style = ParagraphStyle(
+        "ReportHeading", parent=body_style, fontName=bold_font,
+        spaceBefore=8, spaceAfter=5,
+    )
+
+    story = []
+    for raw_line in laudo.splitlines():
+        line = raw_line.strip()
+        if not line:
+            story.append(Spacer(1, 4))
+        elif line.upper() == "LAUDO CLÍNICO":
+            story.append(Paragraph(line, title_style))
+        elif re.match(r"^[1-5]\.\s", line):
+            story.append(Paragraph(escape(line), heading_style))
+        else:
+            story.append(Paragraph(escape(line), body_style))
+
+    document = SimpleDocTemplate(
+        str(pdf_path), pagesize=A4,
+        rightMargin=2 * cm, leftMargin=2 * cm,
+        topMargin=2 * cm, bottomMargin=2 * cm,
+        title=f"Laudo clínico {paciente_id}",
+        author="Assistente Virtual Médico - Tech Challenge Fase 3",
+    )
+    document.build(story)
+    return str(pdf_path)
 
 LAUDO_SYSTEM_PROMPT = (
     "Você é um assistente que redige laudos clínicos estruturados para um "
@@ -41,9 +108,10 @@ def gerar_laudo(
     protocolos = ", ".join(f["protocol_id"] for f in fontes) or "nenhum"
     exames = ", ".join(paciente.get("exames_pendentes", [])) or "nenhum"
 
+    timestamp = datetime.now()
     user_message = (
         f"Paciente: {paciente['paciente_id']}\n"
-        f"Data/hora: {datetime.now().isoformat()}\n"
+        f"Data/hora: {timestamp.isoformat()}\n"
         f"Diagnóstico principal: {paciente['diagnostico_principal']}\n"
         f"Exames pendentes: {exames}\n"
         f"Conduta sugerida pelo assistente: {sugestao_tratamento}\n"
@@ -59,4 +127,9 @@ def gerar_laudo(
     )
 
     laudo_validado, avisos = enforce_human_validation(laudo_bruto)
-    return {"laudo": laudo_validado, "avisos_seguranca": avisos}
+    pdf_path = salvar_laudo_pdf(laudo_validado, paciente["paciente_id"], timestamp)
+    return {
+        "laudo": laudo_validado,
+        "avisos_seguranca": avisos,
+        "pdf_path": pdf_path,
+    }

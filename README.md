@@ -62,6 +62,7 @@ TechChallenge3GFA/
 │   └── reference/             # Material de referência da Fase 2
 ├── outputs/
 │   ├── models/                 # Adaptadores LoRA (gerado, não versionado)
+│   ├── reports/                # PDFs de laudos gerados (gerado, não versionado)
 │   └── audit_log.json          # Log de auditoria (gerado, não versionado)
 ├── src/
 │   ├── fine_tuning/
@@ -139,7 +140,8 @@ python -m src.demo
 ```
 
 Cobre, em sequência: comparação da LLM personalizada, fluxo automatizado do
-LangGraph, uma pergunta clínica contextualizada via RAG e os logs de auditoria.
+LangGraph, uma pergunta clínica contextualizada via RAG, geração de laudo em PDF
+e os logs de auditoria. Os PDFs ficam em `outputs/reports/`.
 
 ## Rodando a Suíte de Testes
 

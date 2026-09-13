@@ -107,7 +107,8 @@ paciente, o sistema:
    estrutura fixa (seguindo um modelo de referência que criamos em
    `data/raw/synthetic_laudo_template.md`) — atendendo ao pedido do enunciado
    por "modelos de laudos, receitas e procedimentos internos" como um dos
-   tipos de saída esperados do assistente.
+  tipos de saída esperados do assistente. Além do texto no resumo, o documento
+  é exportado para PDF em `outputs/reports/`, com fonte compatível com acentos.
 7. **Aplica guardrails de segurança**: o sistema verifica se a resposta soa
    como uma prescrição direta e imperativa (por exemplo, "tome 500mg de X") e,
    se detectar isso, reforça um aviso. Toda resposta clínica recebe

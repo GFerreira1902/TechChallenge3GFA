@@ -32,6 +32,7 @@ ipykernel>=6.29.4
 # Utilitários
 joblib>=1.4.2
 python-dotenv>=1.0.1
+reportlab>=4.0.0
 
 # Testes
 pytest>=8.2.2

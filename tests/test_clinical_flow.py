@@ -117,11 +117,16 @@ def test_node_gerar_laudo_usa_report_generator_e_retorna_laudo():
 
     with patch(
         "src.langgraph_flows.clinical_flow.gerar_laudo",
-        return_value={"laudo": "LAUDO CLINICO gerado.", "avisos_seguranca": []},
+        return_value={
+            "laudo": "LAUDO CLINICO gerado.",
+            "avisos_seguranca": [],
+            "pdf_path": "outputs/reports/laudo_PAC-001.pdf",
+        },
     ) as mock_gerar_laudo:
         result = node_gerar_laudo(state, llm_client=fake_llm)
 
     assert result["laudo"] == "LAUDO CLINICO gerado."
+    assert result["laudo_pdf_path"] == "outputs/reports/laudo_PAC-001.pdf"
     mock_gerar_laudo.assert_called_once_with(
         llm_client=fake_llm,
         paciente=FAKE_PATIENT,
