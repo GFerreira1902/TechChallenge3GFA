@@ -35,7 +35,10 @@ def _format_report_text(
     """Monta o documento com campos objetivos e o texto do modelo como complemento."""
     exames = paciente.get("exames_pendentes", [])
     exames_texto = "; ".join(exames) if exames else "Nenhum exame pendente."
-    protocolos = ", ".join(f["protocol_id"] for f in fontes) or "Nenhum protocolo identificado."
+    protocolos = ", ".join(
+        f"{fonte['protocol_id']} - {fonte.get('titulo', 'Protocolo sem título')}"
+        for fonte in fontes
+    ) or "Nenhum protocolo identificado."
     condutas = [
         f"Sugestão retornada pelo pipeline RAG: {_remove_validation_notice(sugestao_tratamento)}",
         f"Revisar os exames pendentes: {exames_texto}",

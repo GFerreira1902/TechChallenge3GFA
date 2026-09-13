@@ -113,6 +113,10 @@ class MedicalAssistantRAG:
             metadata={
                 "paciente_id": paciente_id,
                 "fontes": [s["protocol_id"] for s in sources],
+                "fontes_detalhadas": [
+                    {"protocol_id": s["protocol_id"], "titulo": s["titulo"]}
+                    for s in sources
+                ],
             },
         )
 

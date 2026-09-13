@@ -126,7 +126,10 @@ def node_finalizar(state: ClinicalFlowState) -> dict:
         linhas.append("Alertas críticos: nenhum")
 
     linhas.append(f"Sugestão de conduta: {state['sugestao_tratamento']}")
-    fontes = ", ".join(f["protocol_id"] for f in state.get("fontes", []))
+    fontes = ", ".join(
+        f"{fonte['protocol_id']} - {fonte.get('titulo', 'Protocolo sem título')}"
+        for fonte in state.get("fontes", [])
+    )
     linhas.append(f"Fontes consultadas: {fontes or 'nenhuma'}")
     linhas.append(f"PDF do laudo: {state.get('laudo_pdf_path', 'nao gerado')}")
     linhas.append(f"\nLaudo clínico gerado:\n{state.get('laudo', 'nao gerado')}")
