@@ -91,6 +91,8 @@ class LocalFineTunedLLMClient:
                 do_sample=False,
                 temperature=None,
                 top_p=None,
+                no_repeat_ngram_size=4,
+                repetition_penalty=1.15,
             )
 
         response = self._tokenizer.decode(

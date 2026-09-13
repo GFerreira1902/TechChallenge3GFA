@@ -42,6 +42,11 @@ def load_protocol_documents(path: str = PROTOCOLS_PATH) -> list[Document]:
     ]
 
 
+def load_protocol_documents_for_search(path: str = PROTOCOLS_PATH) -> list[Document]:
+    """Alias explicito para recuperar todos os protocolos em buscas hibridas."""
+    return load_protocol_documents(path)
+
+
 def build_index(index_dir: str = INDEX_DIR) -> FAISS:
     """Constroi (ou reconstroi) o indice FAISS a partir dos protocolos sinteticos."""
     documents = load_protocol_documents()

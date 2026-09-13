@@ -4,11 +4,18 @@ gera a resposta do assistente medico, sempre citando as fontes utilizadas
 """
 from __future__ import annotations
 
+import re
 from typing import Any, Optional
 
-from src.langchain_pipeline.knowledge_base import load_index
+from src.langchain_pipeline.knowledge_base import load_index, load_protocol_documents_for_search
 from src.langchain_pipeline.local_llm_client import LocalFineTunedLLMClient
 from src.langchain_pipeline.patient_records import format_patient_context, get_patient
+
+SEARCH_STOPWORDS = {
+    "a", "as", "o", "os", "de", "do", "da", "dos", "das", "e", "em",
+    "para", "por", "com", "sem", "um", "uma", "quais", "qual", "sao",
+    "são", "como", "sobre", "proximas", "próximas", "condutas", "recomendadas",
+}
 
 SYSTEM_PROMPT = (
     "Você é um assistente virtual médico do hospital, treinado para auxiliar "
@@ -33,7 +40,34 @@ class MedicalAssistantRAG:
         self.top_k = top_k
 
     def _retrieve(self, question: str) -> list[dict]:
-        docs = self.vectorstore.similarity_search(question, k=self.top_k)
+        semantic_docs = self.vectorstore.similarity_search(question, k=self.top_k)
+        query_terms = {
+            term for term in re.findall(r"[a-zà-ú]+", question.lower())
+            if len(term) > 3 and term not in SEARCH_STOPWORDS
+        }
+        candidates = {doc.metadata["protocol_id"]: doc for doc in semantic_docs}
+
+        # A similaridade semantica pode confundir protocolos medicos proximos.
+        # O casamento explicito de termos no titulo/conteudo garante que "sepse"
+        # priorize PROT-002 e que "insuficiencia cardiaca" priorize PROT-011.
+        for doc in load_protocol_documents_for_search():
+            searchable = f"{doc.metadata['titulo']} {doc.page_content}".lower()
+            lexical_score = sum(
+                1 for term in query_terms if term in searchable
+            )
+            if lexical_score and doc.metadata["protocol_id"] not in candidates:
+                candidates[doc.metadata["protocol_id"]] = doc
+
+        ranked_docs = sorted(
+            candidates.values(),
+            key=lambda doc: (
+                5 * sum(term in doc.metadata["titulo"].lower() for term in query_terms)
+                + sum(term in doc.page_content.lower() for term in query_terms),
+                doc.metadata["protocol_id"],
+            ),
+            reverse=True,
+        )[: self.top_k]
+        docs = ranked_docs or semantic_docs
         return [
             {
                 "protocol_id": doc.metadata["protocol_id"],
