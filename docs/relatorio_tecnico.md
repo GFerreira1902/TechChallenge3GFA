@@ -183,10 +183,16 @@ improvisar um parágrafo complexo.
 
 Isso não invalida o resultado — o modelo continua funcional, citando as fontes
 corretas e respeitando os guardrails de segurança — mas é uma limitação real
-que registramos aqui. Com mais tempo e mais recursos de hardware, o próximo
-passo natural seria incluir exemplos de treino no formato do prompt completo
-(protocolo + paciente + pergunta, em português), e não apenas pares diretos de
-pergunta/resposta em inglês.
+que registramos aqui. Chegamos a testar se bastaria instruir explicitamente no
+prompt ("responda sempre em português") para corrigir isso, mas o efeito foi
+apenas parcial: em 2 de 3 perguntas testadas, o modelo fine-tuned voltou a
+responder em inglês mesmo com a instrução explícita, enquanto o modelo base
+(sem fine-tuning) manteve o português sem problemas nas três. Ou seja, o
+próprio ajuste fino reforçou um viés para o inglês que uma instrução simples
+de prompt não é suficiente para reverter. Com mais tempo e mais recursos de
+hardware, o próximo passo natural seria incluir exemplos de treino no formato
+do prompt completo (protocolo + paciente + pergunta, em português), e não
+apenas pares diretos de pergunta/resposta em inglês.
 
 ### Segurança e auditoria na prática
 

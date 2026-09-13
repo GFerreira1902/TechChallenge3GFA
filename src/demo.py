@@ -55,6 +55,12 @@ def parte_1_fine_tuning() -> None:
     )
 
     question = COMPARE_QUESTIONS[1]  # tratamento de hipertensao
+    print(
+        "\nNota: esta pergunta esta em ingles de proposito - o fine-tuning foi "
+        "feito 100% com dados do MedQuAD (ingles), entao testamos aqui no "
+        "formato exato do treino. Nas proximas secoes, o assistente completo "
+        "responde em portugues (contexto real de uso)."
+    )
     print(f"\nPergunta: {question}\n")
 
     base_answer = generate_answer(base_model, tokenizer, question)
