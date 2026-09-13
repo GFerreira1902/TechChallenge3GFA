@@ -37,7 +37,7 @@ def _format_report_text(
     exames_texto = "; ".join(exames) if exames else "Nenhum exame pendente."
     protocolos = ", ".join(f["protocol_id"] for f in fontes) or "Nenhum protocolo identificado."
     condutas = [
-        f"Sugestão retornada pelo pipeline RAG: {sugestao_tratamento.strip()}",
+        f"Sugestão retornada pelo pipeline RAG: {_remove_validation_notice(sugestao_tratamento)}",
         f"Revisar os exames pendentes: {exames_texto}",
         f"Consultar os protocolos internos: {protocolos}",
     ]
@@ -45,7 +45,7 @@ def _format_report_text(
         condutas.append("Comunicar e acompanhar o alerta crítico registrado para a equipe responsável.")
     condutas.append("Validar qualquer conduta com o profissional de saúde responsável.")
 
-    complemento = llm_text.strip()
+    complemento = _extract_llm_complement(llm_text)
     if complemento:
         condutas.append(f"Complemento gerado pelo assistente: {complemento}")
 
@@ -76,6 +76,27 @@ def _format_report_text(
             "sem validação humana.",
         ]
     )
+
+
+def _extract_llm_complement(llm_text: str) -> str:
+    """Evita inserir um segundo laudo ou uma frase genérica no documento final."""
+    text = llm_text.strip()
+    normalized = re.sub(r"\s+", " ", text).lower()
+    generic_prefixes = (
+        "com base na consulta do profissional de saúde, as seguintes condutas são recomendadas",
+        "com base na consulta do profissional de saude, as seguintes condutas sao recomendadas",
+    )
+    if not text or "laudo clínico" in normalized or "laudo clinico" in normalized:
+        return ""
+    if normalized.startswith(generic_prefixes):
+        return ""
+    return text
+
+
+def _remove_validation_notice(text: str) -> str:
+    """Mantém o aviso de validação apenas no rodapé do laudo."""
+    cleaned = re.split(r"\[AVISO\]|⚠️", text, maxsplit=1, flags=re.IGNORECASE)[0]
+    return cleaned.strip().rstrip("-").strip()
 
 
 def _register_fonts() -> tuple[str, str]:
