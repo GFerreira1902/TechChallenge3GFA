@@ -91,12 +91,18 @@ TechChallenge3GFA/
 
 ```powershell
 python -m venv .venv
-.venv\Scripts\activate          # Windows
+.\.venv\Scripts\Activate.ps1    # PowerShell
 pip install -r requirements.txt
 ```
 
+> Se o PowerShell bloquear a execução de scripts, rode antes:
+> `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+>
 > No Windows, se o console exibir acentos quebrados, rode antes:
 > `chcp 65001` e `$env:PYTHONIOENCODING="utf-8"`.
+
+> O projeto usa dados sintéticos e fictícios para os prontuários e protocolos
+> internos. O único dado público usado no fine-tuning é o **MedQuAD**.
 
 ### 1. Preparar o dataset (MedQuAD limpo/amostrado)
 
@@ -134,18 +140,20 @@ python -m src.langchain_pipeline.rag_chain
 
 ### 5. Testar o fluxo de decisão clínica (LangGraph)
 
-```powershell
-python -m src.langgraph_flows.clinical_flow
-```
-
-Sem argumentos, o fluxo sorteia um paciente fictício e cria uma pergunta de
-acordo com o diagnóstico dele a cada execução. Para repetir um cenário:
+Recomendado para apresentação e validação estável em ambiente local:
 
 ```powershell
 python -m src.langgraph_flows.clinical_flow --paciente-id PAC-002
 ```
 
-### 6. Rodar a demonstração completa (recomendado para conferir tudo de uma vez)
+Também é possível executar sem argumento, mas o cenário aleatório pode variar a
+cada execução:
+
+```powershell
+python -m src.langgraph_flows.clinical_flow
+```
+
+### 6. Rodar a demonstração completa (somente em ambiente com suporte de aceleração)
 
 ```powershell
 python -m src.demo
@@ -154,6 +162,10 @@ python -m src.demo
 Cobre, em sequência: comparação da LLM personalizada, fluxo automatizado do
 LangGraph, uma pergunta clínica contextualizada via RAG, geração de laudo em PDF
 e os logs de auditoria. Os PDFs ficam em `outputs/reports/`.
+
+> Observação importante: essa rotina é mais pesada e depende de GPU/acelerador
+> disponível. Em ambientes sem suporte de aceleração, a execução pode falhar.
+> Para apresentação segura e estável, prefira os comandos do passo 5.
 
 ## Rodando a Suíte de Testes
 
@@ -167,12 +179,12 @@ python -m pytest tests/ -v
 ## Entregáveis da Fase 3
 
 - **Repositório GitHub Oficial:** [Acessar Código Fonte](https://github.com/GFerreira1902/TechChallenge3GFA)
-- **Vídeo de demonstração:** _link será incluído antes da entrega_
+- **Vídeo de demonstração:** [link do vídeo será incluído antes da entrega]
 - **Modelo fine-tuned:** [Qwen2.5 Medical LoRA no Hugging Face](https://huggingface.co/gferreiradevv/techchallenge3-qwen25-medical-lora)
 - **Dataset processado:** [MedQuAD Medical no Hugging Face](https://huggingface.co/datasets/gferreiradevv/techchallenge3-medquad-medical)
 - Código-fonte: pipeline de fine-tuning, integração LangChain, fluxos LangGraph;
 - Dataset anonimizado/sintético;
-- **Relatório técnico:** [docs/relatorio_tecnico.md](docs/relatorio_tecnico.md), com o processo
+- **Relatório técnico:** [docs/relatorio_tecnico.md](docs/relatorio_tecnico.md), localizado no diretório docs/ do repositório, com o processo
   de fine-tuning, descrição do assistente, diagrama do fluxo LangChain/LangGraph e avaliação
   do modelo;
 
